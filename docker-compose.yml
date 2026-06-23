@@ -1,0 +1,48 @@
+  services:
+    backend:
+      build:
+        context: ./planqr-backend
+      environment:
+        NODE_ENV: ${NODE_ENV}
+        PORT: ${PORT}
+        DISABLE_HTTPS: ${DISABLE_HTTPS}
+        BACKEND_PUBLIC_URL: ${BACKEND_PUBLIC_URL}
+        CORS_ORIGIN: ${CORS_ORIGIN}
+        DATABASE_URL: ${DATABASE_URL}
+        JWT_SECRET: ${JWT_SECRET}
+        ROOT_ADMIN_LOGIN: ${ROOT_ADMIN_LOGIN:-}
+        ROOT_ADMIN_PASSWORD: ${ROOT_ADMIN_PASSWORD:-}
+        LDAP_SYNC_ENABLED: ${LDAP_SYNC_ENABLED:-false}
+        LDAP_SYNC_SEARCH_BASE_DN: ${LDAP_SYNC_SEARCH_BASE_DN:-}
+        LDAP_SYNC_MODE: "${LDAP_SYNC_MODE:-all}"
+        LDAP_SYNC_FULL_FILTER: "${LDAP_SYNC_FULL_FILTER:-(uid=*)}"
+        LDAP_SYNC_FULL_PAGE_SIZE: "${LDAP_SYNC_FULL_PAGE_SIZE:-500}"
+        LDAP_SYNC_FULL_USER_LIMIT: "${LDAP_SYNC_FULL_USER_LIMIT:-0}"
+        LDAP_SYNC_KNOWN_USER_LIMIT: ${LDAP_SYNC_KNOWN_USER_LIMIT:-2000}
+        LDAP_SYNC_BATCH_SIZE: ${LDAP_SYNC_BATCH_SIZE:-50}
+        WORKER_SECRET_TOKEN: ${WORKER_SECRET_TOKEN:-}
+        LDAP_URL: ${LDAP_URL}
+        LDAP_DN: ${LDAP_DN}
+        ZUT_SCHEDULE_STUDENT_URL: ${ZUT_SCHEDULE_STUDENT_URL}
+      expose:
+        - "9099"
+      volumes:
+        - ./certs:/certs:ro
+      command: sh -c "npx prisma db push && npm start"
+      restart: unless-stopped
+
+    frontend:
+      build:
+        context: ./planqr-frontend
+      environment:
+        BACKEND_INTERNAL_URL: ${BACKEND_INTERNAL_URL}
+        ZUT_SCHEDULE_STUDENT_URL: ${ZUT_SCHEDULE_STUDENT_URL}
+        ZUT_SCHEDULE_URL: ${ZUT_SCHEDULE_URL}
+        ZUT_PLAN_BASE_URL: ${ZUT_PLAN_BASE_URL}
+      ports:
+        - "${FRONTEND_PORT}:443"
+      volumes:
+        - ./certs:/etc/nginx/certs:ro
+      depends_on:
+        - backend
+      restart: unless-stopped

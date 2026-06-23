@@ -1,0 +1,6 @@
+[submodule "planqr-backend"]
+	path = planqr-backend
+	url = git@github.com:IKAR-IPZ/planqr-backend.git
+[submodule "planqr-frontend"]
+	path = planqr-frontend
+	url = git@github.com:IKAR-IPZ/planqr-frontend.git
